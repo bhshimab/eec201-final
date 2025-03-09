@@ -1,10 +1,10 @@
 %% Comment out the tests you don't want to run
 
 % Run this for test 7
-% test7()
+test7()
 
 % Run this for test 8
-test8()
+% test8()
 
 % Run this for test 9
 % test9()
