@@ -1,21 +1,22 @@
 %% Comment out the tests you don't want to run
 
 % Run this for test 7
-test7()
+% test7()
 
-% 
+% Run this for test 8
+test8()
 
 % Run this for test 9
-test9()
+% test9()
 
 % Run this for test 10a Question 1
-test10aQ1()
+% test10aQ1()
 
 % Run this for test 10a Question 2
-test10aQ2()
+% test10aQ2()
 
 % Run this for test 10b
-test10b()
+% test10b()
 
 %% Batch tests
 function test7()
@@ -28,6 +29,10 @@ function test7()
     % Initialize storage for training VQ codebooks
     vq_codebooks = cell(1, num_train);
     
+    % Counter for correct matches
+    correct_matches = 0;
+    total_tests = 0;
+
     % Load training data and compute VQ codebooks
     for i = 1:num_train
         filename = sprintf("GivenSpeech_Data/Training_Data/s%d.wav", i);
@@ -39,8 +44,9 @@ function test7()
     for j = 1:num_test
         test_filename = sprintf("GivenSpeech_Data/Test_Data/s%d.wav", j);
         test_mfcc = mfccvec(test_filename); % Compute MFCC for test speech
-        test_codebook = test_mfcc;%vq(test_mfcc, M, eps); % Compute VQ codebook for test data
-        
+        test_codebook = test_mfcc; % Use MFCC directly for comparison
+        total_tests = total_tests + 1;
+
         % Compare test VQ codebook with all training codebooks
         min_dist = inf;
         best_match = -1;
@@ -54,9 +60,89 @@ function test7()
             end
         end
     
+        % Check if the match is correct (test number matches training number)
+        if best_match == j
+            correct_matches = correct_matches + 1;
+        end
+
         % Print best matching speaker for this test file
         fprintf("Test file s%d.wav best matches with Training file s%d.wav\n", j, best_match);
     end
+
+    % Display correct match statistics
+    fprintf("\nCorrect matches: %d/%d (%.2f%%)\n", correct_matches, total_tests, (correct_matches / total_tests) * 100);
+end
+
+function test8()
+    % Number of training and test files
+    num_train = 11;
+    num_test = 8;
+    M = 64; % Number of codebook centroids
+    eps = 0.01; % Convergence threshold
+    
+    % Initialize storage for training VQ codebooks
+    vq_codebooks = cell(1, num_train);
+    
+    % Notch filter parameters (adjustable)
+    notch_freqs = [250, 400];  % Frequencies to suppress (Hz)
+    
+    % Load training data and compute VQ codebooks
+    for i = 1:num_train
+        filename = sprintf("GivenSpeech_Data/Training_Data/s%d.wav", i);
+        mfcc_data = mfccvec(filename); % Compute MFCC for training speech
+        vq_codebooks{i} = vq(mfcc_data, M, eps); % Compute VQ codebook
+    end
+    
+    % Counters for correct matches
+    correct_matches = 0;
+    total_tests = 0;
+
+    % Load test data, apply notch filtering, save, and compare against training set
+    for j = 1:num_test
+        test_filename = sprintf("GivenSpeech_Data/Test_Data/s%d.wav", j);
+        [y, fs] = audioread(test_filename); % Load audio signal
+        
+        % Apply notch filters to the test signal
+        filtered_signal = y;
+        for f = notch_freqs
+            d = designfilt('bandstopiir', 'FilterOrder', 2, ...
+                           'HalfPowerFrequency1', f-5, 'HalfPowerFrequency2', f+5, ...
+                           'SampleRate', fs);
+            filtered_signal = filtfilt(d, filtered_signal); % Apply notch filter
+        end
+        
+        % Save the filtered signal to a temporary file
+        filtered_filename = sprintf("GivenSpeech_Data/Test_Data/filtered_s%d.wav", j);
+        audiowrite(filtered_filename, filtered_signal, fs);
+
+        % Compute MFCC for the filtered file
+        test_mfcc = mfccvec(filtered_filename); 
+        total_tests = total_tests + 1;
+
+        % Compare test VQ codebook with all training codebooks
+        min_dist = inf;
+        best_match = -1;
+        
+        for i = 1:num_train
+            dist = vq_dist(test_mfcc, vq_codebooks{i}); % Compute VQ distortion
+            
+            if dist < min_dist
+                min_dist = dist;
+                best_match = i;
+            end
+        end
+
+        % Check if the match is correct (test number matches training number)
+        if best_match == j
+            correct_matches = correct_matches + 1;
+        end
+
+        % Print best matching speaker for this test file
+        fprintf("Filtered Test file s%d.wav best matches with Training file s%d.wav\n", j, best_match);
+    end
+
+    % Display correct match statistics
+    fprintf("\nCorrect matches (Notch Filtered): %d/%d (%.2f%%)\n", correct_matches, total_tests, (correct_matches / total_tests) * 100);
 end
 
 function test9() 
