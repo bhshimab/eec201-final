@@ -13,7 +13,7 @@ Run "batchtest.m" to demonstrate tests 7-10 (uncomment out the task function as 
 
 
 ## 1. Project summary
-This project builds a speaker recognition architecture using Mel frequency cepstrum coefficient (MFCC) feature extraction and a vector quantization (VQ) approach for feature matching. Initial tests yield promising results.
+This project builds a speaker recognition architecture using Mel frequency cepstrum coefficient (MFCC) feature extraction and a vector quantization (VQ) approach for feature matching.
 ### 1.1 Data sets
 * Baseline test data of "zero"; 11 training, 8 testing
 * 2024 student recordings of "zero" and "twelve"; 18 training, 18 testing
