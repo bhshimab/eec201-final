@@ -6,6 +6,7 @@ Run "batchtest.m" to demonstrate tests 7-10 (uncomment out the task function as 
 # Speaker Recognition Report
 ### Table of Contents  
 - [1. Introduction](#1-project-summary)
+- [2. Feature extraction](#2-feature-extraction)
 - [3. Feature analysis](#3-feature-analysis)
   * [3.1 Clustering and Training](#31-clustering-and-training)
 
