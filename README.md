@@ -6,6 +6,16 @@ Run "batchtest.m" to demonstrate tests 7-10 (uncomment out the task function as 
 ![til](./VQTraining.gif)
 
 
+| Task | Description | Result |
+| :---- | :---- | :---- |
+| 7 |  | 7/8 (87.5%) |
+| 8 |  | 7/8 |
+| 9 |  | 16/18 (89%) |
+| 10a.1 |  | 14/18 twelve 16/18 zero |
+| 10a.2 |  | Speaker 30/36 Word 36/36 |
+| 10b |  | 21/23 ‘Five’ 22/23 ‘Eleven’ Word classification 46/46 100% |
+
+
 ### 2.1 Clustering and Training
 
 For feature matching, we adopt the Vector Quantization (VQ) method. Clustering is performed using the LBG algorithm with slight modifications for numerical stability. The algorithm is implemented as follows:
