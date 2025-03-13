@@ -6,13 +6,15 @@ Run "batchtest.m" to demonstrate tests 7-10 (uncomment out the task function as 
 # Speaker Recognition Report
 ### Table of Contents  
 - [1. Introduction](#1-introduction)
-- [2. Feature analysis](#2-feature-analysis)
-  * [2.1 Clustering and Training](#21-clustering-and-training)
+- [3. Feature analysis](#3-feature-analysis)
+  * [3.1 Clustering and Training](#31-clustering-and-training)
 
 
-![til](./VQTraining.gif)
+
 
 ## 1. Introduction
+This project builds a speaker recognition architecture using Mel frequency cepstrum coefficient (MFCC) feature extraction and a vector quantization (VQ) approach for feature matching. Initial tests yield promising results.
+### 1.1 Training and test data
 
 | Task | Description | Result |
 | :---- | :---- | :---- |
@@ -23,8 +25,11 @@ Run "batchtest.m" to demonstrate tests 7-10 (uncomment out the task function as 
 | 10a.2 |  | Speaker 30/36 Word 36/36 |
 | 10b |  | 21/23 ‘Five’ 22/23 ‘Eleven’ Word classification 46/46 100% |
 
-## 2. Feature analysis
-### 2.1 Clustering and Training
+## 2. Feature extraction
+
+
+## 3. Feature analysis
+### 3.1 Clustering and Training
 
 For feature matching, we adopt the Vector Quantization (VQ) method. Clustering is performed using the LBG algorithm with slight modifications for numerical stability. The algorithm is implemented as follows:
 
