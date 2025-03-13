@@ -5,20 +5,24 @@ Run "batchtest.m" to demonstrate tests 7-10 (uncomment out the task function as 
 
 # Speaker Recognition Report
 ### Table of Contents  
-- [1. Introduction](#1-introduction)
+- [1. Introduction](#1-project-summary)
 - [3. Feature analysis](#3-feature-analysis)
   * [3.1 Clustering and Training](#31-clustering-and-training)
 
 
 
 
-## 1. Introduction
+## 1. Project summary
 This project builds a speaker recognition architecture using Mel frequency cepstrum coefficient (MFCC) feature extraction and a vector quantization (VQ) approach for feature matching. Initial tests yield promising results.
-### 1.1 Training and test data
-There are three sets of test data provided.
+### 1.1 Data sets
 * Baseline test data of "zero"; 11 training, 8 testing
 * 2024 student recordings of "zero" and "twelve"; 18 training, 18 testing
 * 2025 student recordings of "five" and "eleven"; 23 training, 23 testing
+### 1.2 Key MATLAB Functions
+* `out = mfccvec(file)`: Inputs `file` as a text string, outputs matrix `out` with 12 coefficient rows and variable frames.
+* `m = melfb_own(p, n, fs)`: Inputs `p` number of filter banks, `n` number of FFT coefficients, and `fs` sampling frequency and outputs matrix `m` containing Mel filter banks.
+* `codebook = vq(mfcc, M, eps)`: Inputs matrix `mfcc` of Mel frequency cepstrum coefficient vectors, `M` number of centroids, and `eps` splitting parameter and outputs M x n `codebook`, where n equals the cepstrum coefficient count.
+
 
 ## 2. Feature extraction
 
@@ -70,8 +74,7 @@ For feature matching, we adopt the Vector Quantization (VQ) method. Clustering i
                   </ul>
                 </li>
                 <li>Compute <i>new_distortion</i> by averaging <i>dists</i></li>
-                <li>Compute change in distortion:
-                  <br> \\( \textit{min\_distortion} - \textit{new\_distortion} \\)
+                <li>Compute change in distortion: <i>min_distortion</i> - <i>new_distortion</i>
                   <br> If change in distortion is smaller than <i>threshold</i>, <b>break</b>
                   <br> Else, update <i>min_distortion</i> with <i>new_distortion</i>
                 </li>
