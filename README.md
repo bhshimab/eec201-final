@@ -15,15 +15,10 @@ Run "batchtest.m" to demonstrate tests 7-10 (uncomment out the task function as 
 ## 1. Introduction
 This project builds a speaker recognition architecture using Mel frequency cepstrum coefficient (MFCC) feature extraction and a vector quantization (VQ) approach for feature matching. Initial tests yield promising results.
 ### 1.1 Training and test data
-
-| Task | Description | Result |
-| :---- | :---- | :---- |
-| 7 |  | 7/8 (87.5%) |
-| 8 |  | 7/8 |
-| 9 |  | 16/18 (89%) |
-| 10a.1 |  | 14/18 twelve 16/18 zero |
-| 10a.2 |  | Speaker 30/36 Word 36/36 |
-| 10b |  | 21/23 ‘Five’ 22/23 ‘Eleven’ Word classification 46/46 100% |
+There are three sets of test data provided.
+* Baseline test data of "zero"; 11 training, 8 testing
+* 2024 student recordings of "zero" and "twelve"; 18 training, 18 testing
+* 2025 student recordings of "five" and "eleven"; 23 training, 23 testing
 
 ## 2. Feature extraction
 
@@ -111,3 +106,16 @@ Once the codebooks have been completed, we tackle the problem of matching test s
 We initially used method 1 but quickly saw poor results. In addition, the order of complexity for one calculation of the codebook is *O*(*fM*log(*M)*), where *M* is the size of the codebook and *f* is the number of MFCC frames. The complexity of the distance calculation for the distortion calculation function `vq_dist(test, cb)` is *O*(*nM*), where *n* is the size of the test codebook and *M* is the size of the training codebook. This results in a total complexity of *O*(*fM*log(*M)*\+*nMc*), where c is the number of codebooks.
 
 Method 2 avoids the clustering step and decreases total complexity. Complexity is now O(*fMc*) 
+
+## 4. Results
+### 4.1 Initial results
+
+| Task | Description | Result |
+| :---- | :---- | :---- |
+| 7 |  | 7/8 (87.5%) |
+| 8 |  | 7/8 |
+| 9 |  | 16/18 (89%) |
+| 10a.1 |  | 14/18 twelve 16/18 zero |
+| 10a.2 |  | Speaker 30/36 Word 36/36 |
+| 10b |  | 21/23 ‘Five’ 22/23 ‘Eleven’ Word classification 46/46 100% |
+
