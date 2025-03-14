@@ -118,10 +118,9 @@ We saw promising initial results with a codebook size of _M_ = 64
 | Task | Description | Result |
 | :---- | :---- | :---- |
 | 7 | Recognition rate of baseline “zero” recordings | 7/8 (87.5%) |
-| 8 | Recognition rate after using notch filters | 7/8 |
+| 8 | Recognition rate after using notch filters | 7/8 (87.5%) |
 | 9 | 2024 student “zero” recordings + baseline “zero” recordings | 16/18 (89%) |
-| 10a.1 | Accuracy of 2024 student data; “twelve” results vs “zero” results | 14/18 twelve 16/18 zero |
-| 10a.2 | Accuracy of 2024 student data; speaker recognition vs word recognition | Speaker 30/36 Word 36/36 |
-| 10b | 2025 student data; speaker recognition using ;five’ vs using ‘eleven’.
-Word recognition results | 21/23 ‘Five’ 22/23 ‘Eleven’ Word classification 46/46 100% |
+| 10a.1 | Accuracy of 2024 student data; “twelve” results vs “zero” results | "twelve": 14/18 (78%), "zero" 16/18 (89%) |
+| 10a.2 | Accuracy of 2024 student data; speaker recognition vs word recognition | Speaker: 30/36 (83%), word: 36/36 (100%)|
+| 10b | 2025 student data; speaker recognition using ;five’ vs using ‘eleven’. Word recognition results | 21/23 ‘Five’ 22/23 ‘Eleven’ Word classification 46/46 100% |
 
