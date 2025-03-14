@@ -97,7 +97,7 @@ This is accomplished by filtering the spectrum frames into a set of logarithmica
 #### 2.3.3 DCT of the logarithm of the spectrum
 The final step to produce the Mel-frequency cepstrum is to perform another transform on the resulting filtered spectrogram. The logarithm is taken on the spectrum coefficients, which is done as a means to reduce the contrast between large and small peaks. This compression step also roughly emulates the logarithmic amplitude response of the human ear.
 
-| ![figure2.3.5](./Figures/mfspect.png) | 
+| ![figure2.3.5](./Figures/mfspectlog.png) | 
 |:--:| 
 | *Figure 2.3.5. Logarithmic amplitude scaling of the filtered spectrogram, which shows much more voice information at an even level.* |
 
