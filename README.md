@@ -106,21 +106,22 @@ We are fortunate that the recursive nature of the algorithm accounts for this an
 Once the codebooks have been completed, we tackle the problem of matching test sets against them. We considered a few methods for matching:
 
 1. Generate a new codebook of clusters from the test vectors and compare the similarity between this codebook and the training codebooks.  
-2. Use the raw MFCC vectors and compute the mean distortion between the uncompressed data and the training codebooks.
+2. Use the raw MFCC vectors and compute the total distortion between the uncompressed data and the training codebooks.
 
-We initially used method 1 but quickly saw poor results. In addition, the order of complexity for one calculation of the codebook is *O*(*fM*log(*M)*), where *M* is the size of the codebook and *f* is the number of MFCC frames. The complexity of the distance calculation for the distortion calculation function `vq_dist(test, cb)` is *O*(*nM*), where *n* is the size of the test codebook and *M* is the size of the training codebook. This results in a total complexity of *O*(*fM*log(*M)*\+*nMc*), where c is the number of codebooks.
+We mistakenly initially used method 1 but quickly saw the error in our ways with poor results. In addition, the order of complexity for one calculation of the codebook is *O*(*fM*log(*M)*), where *M* is the size of the codebook and *f* is the number of MFCC frames. The complexity of the distance calculation for the distortion calculation function `vq_dist(test, cb)` is *O*(*nM*), where *n* is the size of the test codebook and *M* is the size of the training codebook. This results in a total complexity of *O*(*fM*log(*M)*\+*nMc*), where c is the number of codebooks.
 
-Method 2 avoids the clustering step and decreases total complexity. Complexity is now O(*fMc*) 
+Method 2 avoids the clustering step and decreases total complexity to O(*fMc*). This change also more closely coincides with the theory behind VQ distortion - by finding the distance from each frame to the nearest codeword, we inherently cluster the test vectors by association. We then take the total sum of the distances to the codewords and compute the total distortion. 
 
 ## 4. Results
 ### 4.1 Initial results
-
+We saw promising initial results with a codebook size of _M_ = 64
 | Task | Description | Result |
 | :---- | :---- | :---- |
-| 7 |  | 7/8 (87.5%) |
-| 8 |  | 7/8 |
-| 9 |  | 16/18 (89%) |
-| 10a.1 |  | 14/18 twelve 16/18 zero |
-| 10a.2 |  | Speaker 30/36 Word 36/36 |
-| 10b |  | 21/23 ‘Five’ 22/23 ‘Eleven’ Word classification 46/46 100% |
+| 7 | Recognition rate of baseline “zero” recordings | 7/8 (87.5%) |
+| 8 | Recognition rate after using notch filters | 7/8 |
+| 9 | 2024 student “zero” recordings + baseline “zero” recordings | 16/18 (89%) |
+| 10a.1 | Accuracy of 2024 student data; “twelve” results vs “zero” results | 14/18 twelve 16/18 zero |
+| 10a.2 | Accuracy of 2024 student data; speaker recognition vs word recognition | Speaker 30/36 Word 36/36 |
+| 10b | 2025 student data; speaker recognition using ;five’ vs using ‘eleven’.
+Word recognition results | 21/23 ‘Five’ 22/23 ‘Eleven’ Word classification 46/46 100% |
 
