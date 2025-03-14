@@ -6,9 +6,18 @@ Run "batchtest.m" to demonstrate tests 7-10 (uncomment out the task function as 
 # Speaker Recognition Report
 ### Table of Contents  
 - [1. Project summary](#1-project-summary)
+  * [1.1 Data sets](11-data-sets)
+  * [1.2 Key MATLAB functions](12-key-matlab-functions)
 - [2. Feature extraction](#2-feature-extraction)
+  * [2.1 Signal features](21-signal-features)
+  * [2.2 Spectral decomposition](22-spectral-decomposition)
+  * [2.3 Cepstral analysis](23-cepstral-analysis)
+    - [2.3.1 Signal preconditioning](231-signal-preconditioning)
+    - [2.3.2 Melody scale filtering](232-melody-scale-filtering)
+    - [2.3.3 DCT](233-dct-of-the-logarithm-of-the-spectrum)
 - [3. Feature matching](#3-feature-matching)
   * [3.1 Clustering and training](#31-clustering-and-training)
+  * [3.2 Matching](32-matching)
 - [4. Results](4-results)
   * [4.1 Initial results](41-initial-results)
   * [4.2 Optimization](42-optimization)
@@ -24,7 +33,7 @@ We use a single file to train a codebook that contains a "fingerprint" of the sp
 * Baseline test data of "zero"; 11 training, 8 testing
 * 2024 student recordings of "zero" and "twelve"; 18 training, 18 testing
 * 2025 student recordings of "five" and "eleven"; 23 training, 23 testing
-### 1.2 Key MATLAB Functions
+### 1.2 Key MATLAB functions
 * `out = mfccvec(file)`: Creates an MFCC matrix from a sound file. Inputs `file` as a text string, outputs matrix `out` with 12 coefficient rows and variable frames.
 * `m = melfb_own(p, n, fs)`: Creates Mel spaced filter banks. Inputs `p` number of filter banks, `n` number of FFT coefficients, and `fs` sampling frequency and outputs matrix `m` containing Mel filter banks.
 * `codebook = vq(mfcc, M, eps)`: Creates a codebook from a training MFCC matrix. Inputs matrix `mfcc` of Mel frequency cepstrum coefficient vectors, `M` number of centroids, and `eps` splitting parameter and outputs M x n `codebook`, where n equals the cepstrum coefficient count.
