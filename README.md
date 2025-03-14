@@ -32,7 +32,71 @@ We use a single file to train a codebook that contains a "fingerprint" of the sp
 
 
 ## 2. Feature extraction
+### 2.1 Signal features
+Speech signals contain information. The human vocal tract consists of a series of mechanical and acoustic structures, the diaphragm, lungs, throat, vocal cords, mouth, tongue, and lips, all of which work in coordination to produce sound. These structures, as well as their modulation, vary from speaker to speaker: two individual speakers are differentiable to a listener even if the words spoken are identical.
 
+The acoustic information of speech can be captured and analysed as digital recordings. This project seeks to recover and classify this contained information as a means to differentiate and identify a set of different speakers. We will do so by analysing the cepstrum, which is a structure that describes the distribution of harmonic information in a signal, which is useful as it provides an analytic means to describe the nature of each speakers’ unique vocalizations.
+
+### 2.2 Spectral decomposition
+Speech information is formed by the structures in the vocal tract, which are dynamic and resonant. The resulting acoustic signals thereby contain a series of tones and noises which vary in time. Fourier analysis on its own is then incomplete for this task, as the dynamic formation of speech in time is as important as the resonant harmonics at any point in time. We instead decompose the speech record in both frequency and time by use of the spectrogram.
+	
+The spectrogram is constructed by a series of Fourier transforms on a signal; an evenly time sampled record is divided into even segments, then the Fourier transform is taken on each segment. The resulting spectrogram on a one-dimensional signal is a two-dimensional structure, typically showing the positive Fourier coefficient magnitudes as color, indexed by frequency in the vertical direction, and time in the horizontal.
+
+
+| ![figure2.2.1](./Figures/spectrowinds.png) | 
+|:--:| 
+| *Figure 2.2.1. An example speech signal, blue, is cut into segments that are 1024 samples long, with an overlap of 512 samples. Hann windows are applied to each segment to minimize lobing in the resulting Fourier spectra.* |
+
+Construction of the spectrogram is relatively straightforward; determine the desired frequency and time resolution required, ‘chop up’ the signal and perform any required preprocessing on the segments, then perform the FFT on each segment.
+
+
+| ![figure2.2.2](./Figures/) | 
+|:--:| 
+| *Figure 2.2.2. The resulting set of windowed signal segments that are used for each frame of the spectrogram.* |
+
+| ![figure2.2.3](./Figures/) | 
+|:--:| 
+| *Figure 2.2.3. FFTs are taken on each segment to produce a spectrogram frame. The result is an image, which shows signal frequency information in the vertical axis as it changes over the duration of the record in the horizontal axis. Data here is shown on a logarithmic frequency scale between 100Hz and 6,250Hz to more clearly show the tones in the lower portion of the voice. Amplitude is shown in dB.* |
+
+### 2.3 Cepstral analysis
+A cepstrum is formed by taking the spectrum of a spectrum, and is used to analyse the structure of frequencies and their relationships in a signal. Any Fourier-like transform that maps a space using sinusoidal basis functions can be seen as quantifying the periodicity or repetition rate of features in the original signal. The transform describes how often features occur in the original base dimension; repetition per time (frequency), repetition per distance (images), or in the cepstrum’s case, repetition per repetition. This quantification of information about the signal makes our project a good candidate for cepstral analysis, as we seek to quantify vocal ‘fingerprints’ which describe the vocal differences of various speakers in a way we can use to identify them later.
+The general computation is straightforward: take the logarithm of either an amplitude or power a spectrum and perform another transform. Several interim steps are used in order to better optimize the cepstrum for speech analysis.
+
+#### 2.3.1 Signal preconditioning
+A preconditioning filter is applied to the signal prior to generation of the spectrogram. Typically this is in the form of a single pole FIR highpass, which is used to emphasise high frequency content in the original signal.
+| ![figure2.3.1](./Figures/) | 
+|:--:| 
+| *Figure 2.3.1. A single-pole FIR of the form H(z) = 1 + 15/16z-1, which shows general attenuation of the frequency response over most of the band, and large gain towards high frequency.* |
+
+| ![figure2.3.2](./Figures/) | 
+|:--:| 
+| *Figure 2.3.2. A single frame of a speech spectrogram shown on logarithmic scales, which shows the strong set of tones present during this portion of the original speech record (blue). The same frame after a preconditioning highpass filter is applied (red).* |
+
+#### 2.3.2 Melody scale filtering
+Human hearing has evolved in tandem with the human voice, and so structures that determine perception in the ear are well matched to the distribution of information over frequency in the human voice. The Mel-Scale is a commonly used tool to approximate the logarithmic scale at which humans decode sound. We capitalize on this as a way to ‘pre-emphasize’ the information in the spectrogram over frequency, resulting in a cepstrum analysis that more closely identifies features similar to the way a human ear does.
+	
+This is accomplished by filtering the spectrum frames into a set of logarithmically-spaced bands, and considering only the signal contained within each of the bands. The spectrogram data is reduced by this process which is non-reversible, however this is not detrimental to our analysis.
+
+| ![figure2.3.3](./Figures/mfbank.png) | 
+|:--:| 
+| *Figure 2.3.3. The Mel-Freq filter bank plotted over frequency. Each filter is roughly triangular in the limit of the original FFT frequency resolution. Here the ‘distribution of importance’ of each band is apparent, with lower frequencies being narrower and thus more sensitive to tonality.* |
+
+| ![figure2.3.4](./Figures/) | 
+|:--:| 
+| *Figure 2.3.4. Application of the filter banks on the original spectrogram, showing the reduction of specific frequency resolution. The general speaker vocal features are maintained.* |
+
+#### 2.3.3 DCT of the logarithm of the spectrum
+The final step to produce the Mel-frequency cepstrum is to perform another transform on the resulting filtered spectrogram. The logarithm is taken on the spectrum coefficients, which is done as a means to reduce the contrast between large and small peaks. This compression step also roughly emulates the logarithmic amplitude response of the human ear.
+
+| ![figure2.3.5](./Figures/) | 
+|:--:| 
+| *Figure 2.3.5. Logarithmic amplitude scaling of the filtered spectrogram, which shows much more voice information at an even level.* |
+
+The Mel-frequency cepstrum is finally computed by taking the discrete cosine transform on the scaled, filtered spectrogram. Both the Fourier and inverse Fourier transforms can be used for this step. Commonly the inverse Fourier transform is used, and so results are interpreted as being in the time domain, which typically are in terms of time duration per feature. Both the Fourier transform and the discrete cosine transform, which are both ‘forward’ transforms, can be used, the resulting space is typically referred to as “quefrency”, or cepstral domain, which is in units 1/frequency.
+
+| ![figure2.3.5](./Figures/) | 
+|:--:| 
+| *Figure 2.3.6, 2.3.7. The logarithmic DCT of the Mel-freq filtered spectrogram as-is, showing the compression of the primary features to the lower bins, which is a main characteristic of the DCT (top). The cepstrum of the logarithm of the spectrum plus 1 shows the general spectral content of the filtered spectrogram without the very large offset due to the log of spectrogram terms near 0 (bottom).* |
 
 ## 3. Feature matching
 ### 3.1 Clustering and Training
@@ -42,7 +106,7 @@ For feature matching, we adopt the Vector Quantization (VQ) method. Clustering i
 <div style="display: flex; justify-content: center;">
 <table align="center"">
   <tr>
-    <td><b>Inputs:</b>
+    <td bgcolor="gray"><b>Inputs:</b>
       <ul>
         <li><b>MFCC matrix</b> (<i>n</i> frames × <i>m</i> coefficients)</li>
         <li><b>M</b> (size of codebook)</li>
