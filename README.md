@@ -205,5 +205,15 @@ We saw promising initial results with a codebook size of _M_ = 64
 | 10b | 2025 student data<br>speaker recognition using "five" vs using "eleven" and total recognition results | "five": 21/23 (91.3%)<br>"eleven": 22/23 (95.6%)<br>word classification 46/46 (100%) |
 
 ### 4.2 Optimization
+With our initial tweaks to the clustering algorithm to small tweaks to the accuracy of the VQ clustering, we saw improved results.
+| Test | Description | Result |
+| :---- | :---- | :---- |
+| 7 | Recognition rate of baseline “zero” recordings | 8/8 (100%%) |
+| 8 | Recognition rate after using notch filters | 8/8 (100%%) |
+| 9 | 2024 student “zero” recordings + baseline “zero” recordings | 16/18 (89%) |
+| 10a.1 | Accuracy of 2024 student data; “twelve” results vs “zero” results | "twelve": 15/18 (83%)<br>"zero" 16/18 (89%) |
+| 10a.2 | Accuracy of 2024 student data; speaker recognition vs word recognition | Speaker: 31/36 (86.1%)<br>word: 36/36 (100%)|
+| 10b | 2025 student data<br>speaker recognition using "five" vs using "eleven" and total recognition results | "five": 23/23 (100%)<br>"eleven": 22/23 (95.6%)<br>word classification 46/46 (100%) |
 
 ### 4.3 Final results
+Final results will be added for the final report.
