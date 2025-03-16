@@ -27,16 +27,19 @@ Run "batchtest.m" to demonstrate tests 7-10 (uncomment out the task function as 
 
 
 ## 1. Project summary
-This project builds a speaker recognition architecture using Mel frequency cepstrum coefficient (MFCC) feature extraction and a vector quantization (VQ) approach for feature matching.
+This project builds a speaker recognition system using mel-frequency cepstrum coefficient (MFCC) feature extraction and a vector quantization (VQ) approach for feature matching. We study both speaker recognition and word recognition; both methods are inherently coded into the VQ feature matching approach. The overview of the process is as follows:
+1. Train a set of codebooks by extracting MFCCs of training data (each codebook is trained by a single audio file) and quantizing the vectors into a reduced number of representative vectors.
+2. For a given audio to be identified, find the mean distortion against each codebook in the set. The codebook with the lowest distortion identifies the speaker and word.
+
 ### 1.1 Data sets
-We use a single file to train a codebook that contains a "fingerprint" of the speaker+word. After collecting 
+The training and testing data count are the count of individual voices.
 * Baseline test data of "zero"; 11 training, 8 testing
 * 2024 student recordings of "zero" and "twelve"; 18 training, 18 testing
 * 2025 student recordings of "five" and "eleven"; 23 training, 23 testing
 ### 1.2 Key MATLAB functions
 * `out = mfccvec(file)`: Creates an MFCC matrix from a sound file. Inputs `file` as a text string, outputs matrix `out` with 12 coefficient rows and variable frames.
-* `m = melfb_own(p, n, fs)`: Creates Mel spaced filter banks. Inputs `p` number of filter banks, `n` number of FFT coefficients, and `fs` sampling frequency and outputs matrix `m` containing Mel filter banks.
-* `codebook = vq(mfcc, M, eps)`: Creates a codebook from a training MFCC matrix. Inputs matrix `mfcc` of Mel frequency cepstrum coefficient vectors, `M` number of centroids, and `eps` splitting parameter and outputs M x n `codebook`, where n equals the cepstrum coefficient count.
+* `m = melfb_own(p, n, fs)`: Creates mel spaced filter banks. Inputs `p` number of filter banks, `n` number of FFT coefficients, and `fs` sampling frequency and outputs matrix `m` containing mel-filter banks.
+* `codebook = vq(mfcc, M, eps)`: Creates a codebook from a training MFCC matrix. Inputs matrix `mfcc` of mel-frequency cepstrum coefficient vectors, `M` number of centroids, and `eps` splitting parameter and outputs M x n `codebook`, where n equals the cepstrum coefficient count.
 * `vq_dist(test, codebook)`: Computes total distortion between test data and an existing codebook. Inputs matrices `test` and `codebook` and outputs total distortion `dist` of test vectors against codebook words.
 
 
@@ -194,7 +197,7 @@ Method 2 avoids the clustering step and decreases total complexity to $O(fMc)$. 
 
 ## 4. Results
 ### 4.1 Initial results
-We saw promising initial results with a codebook size of _M_ = 64
+Tests 1-6 are located in /Github/Result_Plots. Results for tests are discussed in this section. Initial results are shown in the table below.
 | Test | Description | Result |
 | :---- | :---- | :---- |
 | 7 | Recognition rate of baseline “zero” recordings | 7/8 (87.5%) |
@@ -205,7 +208,7 @@ We saw promising initial results with a codebook size of _M_ = 64
 | 10b | 2025 student data<br>speaker recognition using "five" vs using "eleven" and total recognition results | "five": 21/23 (91.3%)<br>"eleven": 22/23 (95.6%)<br>word classification 46/46 (100%) |
 
 ### 4.2 Optimization
-With our initial tweaks to the clustering algorithm to small tweaks to the accuracy of the VQ clustering, we saw improved results.
+With our initial tweaks to the accuracy of the VQ clustering, we saw improved results.
 | Test | Description | Result |
 | :---- | :---- | :---- |
 | 7 | Recognition rate of baseline “zero” recordings | 8/8 (100%%) |
@@ -214,6 +217,8 @@ With our initial tweaks to the clustering algorithm to small tweaks to the accur
 | 10a.1 | Accuracy of 2024 student data; “twelve” results vs “zero” results | "twelve": 15/18 (83%)<br>"zero" 16/18 (89%) |
 | 10a.2 | Accuracy of 2024 student data; speaker recognition vs word recognition | Speaker: 31/36 (86.1%)<br>word: 36/36 (100%)|
 | 10b | 2025 student data<br>speaker recognition using "five" vs using "eleven" and total recognition results | "five": 23/23 (100%)<br>"eleven": 22/23 (95.6%)<br>word classification 46/46 (100%) |
+
+We saw improved codebook matching with increased codebook size. Accuracy in recognition increased with codebook size until the size is about 3/4 (CHECK) of the training MFCC matrix. Past that, no increase in accuracy was observed, and further increasing the codebook size saw only diminishing returns.
 
 ### 4.3 Final results
 Final results will be added for the final report.
