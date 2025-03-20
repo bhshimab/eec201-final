@@ -77,7 +77,7 @@ function test8()
     % Number of training and test files
     num_train = 11;
     num_test = 8;
-    M = 64; % Number of codebook centroids
+    M = 64 ; % Number of codebook centroids
     eps = 0.01; % Convergence threshold
     
     % Initialize storage for training VQ codebooks
@@ -158,7 +158,7 @@ function test9()
     num_train = num_train_orig + num_students;
     num_test = num_test_orig + num_students;
     
-    M = 64; % Number of codebook centroids
+    M = 98; % Number of codebook centroids
     eps = 0.01; % Convergence threshold
     
     % Initialize storage for training VQ codebooks
@@ -411,7 +411,7 @@ function test10b()
     % Number of training and test files
     num_train = 23;
     num_test = 23;
-    M = 32; % Number of codebook centroids
+    M = 36; % Number of codebook centroids
     eps = 0.01; % Convergence threshold
 
     % List of student IDs (1 to 23)
@@ -543,6 +543,7 @@ function test10b()
     fprintf("Word Classification Accuracy (Five vs. Eleven): %d/%d (%.2f%%)\n", ...
         correct_word_matches, total_tests, (correct_word_matches / total_tests) * 100);
 end
+
 
 
 
