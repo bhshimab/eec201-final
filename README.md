@@ -16,8 +16,10 @@ Run "batchtest.m" to demonstrate tests 7-10 (uncomment out the task function as 
     - [2.3.2 Melody scale filtering](232-melody-scale-filtering)
     - [2.3.3 DCT](233-dct-of-the-logarithm-of-the-spectrum)
 - [3. Feature matching](#3-feature-matching)
-  * [3.1 Clustering and training](#31-clustering-and-training)
-  * [3.2 Matching](32-matching)
+  * [3.1 Vector quantization](31-vector-quantization)
+  * [3.2 Clustering and training](#32-clustering-and-training)
+  * [3.3 Matching](33-matching)
+  * [3.4 Notch filtering](34-notch-filtering)
 - [4. Results](4-results)
   * [4.1 Initial results](41-initial-results)
   * [4.2 Optimization](42-optimization)
@@ -113,7 +115,11 @@ The Mel-frequency cepstrum is finally computed by taking the discrete cosine tra
 The resulting cepstrogram contains a qualitative measure of the original speaker’s vocal qualities for a specific phrase. This data can be compared through a number of means against other samples to measure speaker likeness and ultimately as a means for differentiating and estimating unknown speaker sources.
 
 ## 3. Feature matching
-### 3.1 Clustering and Training
+
+### 3.1 Vector Quantization
+Theoretically, a speaker saying the same word or phrase twice would result in two identical cepstra. In practice however this isn’t the case. As a means of generalization of the cepstral information, we employ Vector Quantization (VQ). The cepstral data, which is a set of frames each containing coefficients for each quefrency (DCT bin), is considered a set of N DCT Bin dimension N Frames vectors. Typical analysis omits the first DCT bin and uses the following 12, such that the vector space is 12th dimensional and contains N Frames vectors. This vector population is reduced to a smaller number of vectors of the same dimensionality. This reduction, or quantization, increases the generalization capabilities of the differentiator by averaging the near variations of a speaker’s voice (many vectors near one another) to a single centroid point.
+
+### 3.2 Clustering and Training
 
 For feature matching, we adopt the Vector Quantization (VQ) method. Clustering is performed using the LBG algorithm with slight modifications for numerical stability. The algorithm is implemented as follows:
 
@@ -184,18 +190,27 @@ Selection of *ε* too small keeps the split centroids too close together, and th
 - Set empty centroid to zero: conceptually not optimal and doesn’t follow the LBG algorithm, since we now reorder the centroid list.  
 - Set empty centroid to previous centroid.
 
-We are fortunate that the recursive nature of the algorithm accounts for this and corrects the location of the centroids, even if we now use a greater number of cycles to perform this correction. However, speed isn’t our goal here, and we demonstrate with results that the clustering of the vectors is within reason.
+We are fortunate that the recursive nature of the algorithm accounts for this and corrects the location of the centroids, even if we now use a greater number of cycles to perform this correction. We demonstrate with results that the codebooks formed with both methods return high accuracy. 
 
-### 3.2 Matching
+### 3.3 Matching
 
 Once the codebooks have been completed, we tackle the problem of matching test sets against them. We considered a few methods for matching:
 
 1. Generate a new codebook of clusters from the test vectors and compare the similarity between this codebook and the training codebooks.  
 2. Use the raw MFCC vectors and compute the total distortion between the uncompressed data and the training codebooks.
 
-We mistakenly initially used method 1 but quickly saw the error in our ways with poor results. In addition, the order of complexity for one calculation of the codebook is $O(fM\text{log}(M))$, where *M* is the size of the codebook and $f$ is the number of MFCC frames. The complexity of the distance calculation for the distortion calculation function `vq_dist(test, cb)` is $O(nM)$, where $n$ is the size of the test codebook and $M$ is the size of the training codebook. This results in a total complexity of $O(fM\text{log}(M)\+nMc)$, where c is the number of codebooks.
+We initially used method 1 but quickly noticed we could get good results with the other method. In addition, the order of complexity for one calculation of the codebook is $O(fM\text{log}(M))$, where *M* is the size of the codebook and $f$ is the number of MFCC frames. The complexity of the distance calculation for the distortion calculation function `vq_dist(test, cb)` is $O(nM)$, where $n$ is the size of the test codebook and $M$ is the size of the training codebook. This results in a total complexity of $O(fM\text{log}(M)\+nMc)$, where c is the number of codebooks.
 
-Method 2 avoids the clustering step and decreases total complexity to $O(fMc)$. This change also more closely coincides with the theory behind VQ distortion - by finding the distance from each frame to the nearest codeword, we inherently cluster the test vectors by association. We then take the total sum of the distances to the codewords and compute the total distortion. 
+Method 2 avoids the clustering step and decreases total complexity to $O(fMc)$. This change also more closely coincides with the theory behind VQ distortion - by finding the distance from each frame to the nearest codeword, we inherently cluster the test vectors by association. We then take the total sum of the distances to the codewords and compute the total distortion.
+
+However, we demonstrate in our final results that quantizing the test vectors also end up with very accurate results, even if the computation takes more time.
+
+### 3.4 Notch filtering
+A modified test data set was produced by applying a series of narrow band reject filters to the test dataset records. Four filters were chosen with center frequencies of 200Hz, 450Hz, 1.2kHz, and 3700kHz, each with a bandwidth plus/minus 10Hz above and below each center frequency. The FIR order chosen was 256, and the filter was applied bidirectionally to maintain signal characteristics at the start and end of the signal to match the unfiltered signals as closely as possible.
+The baseline test and training data initially produced an identification rate of 7 out of 8, with the one miss of s3 in the test data being attributed to the s6 training data sample. The filtered test data, when compared against the unaltered training data, also produced a 7 out of 8 accuracy with the same fault of s3 filtered test to s6 training.
+When compared to the baseline 2024 student recording “twelve” training set, the test set of the same phrase yielded a 17 of 18 accuracy rate, with the miss being test data 1 being attributed to training data 18. After application of the filtering parameters previously defined, the success rate was still the same 17 of 18, however now the miss was then test data 18 was attributed to training data 12.
+Application of notch filtering on static bands of the data going into the cepstrum processing stage likely has minimal effect on the overall ceptstral output. The cepstrum encodes the relationship of harmonics present in the speech record over frames of the record’s spectrogram. Removing frequency content via narrow band filtering effectively removes a handful of spectral bins, nullifying the ‘stripes’ that those bins represent in the spectrogram. The results of the generated cepstra with and without those frequency bands in the original spectra depends on the frequency distributions in the rest of the signal. If there are sufficient harmonics present in the rest of a series such that a single missing harmonic doesn’t sufficiently occlude the spectral distribution, then the resulting cepstral coefficients will still likely represent the original series’ harmonic content. 
+
 
 ## 4. Results
 ### 4.1 Initial results
@@ -211,26 +226,24 @@ Tests 1-6 are located in /Github/Result_Plots. Results for tests are discussed i
 
 ### 4.2 Optimization
 With our initial tweaks to the accuracy of the VQ clustering, we saw improved results.
+We saw improved codebook matching with increased codebook size. Accuracy in recognition increased with codebook size until the size is about 3/4 (CHECK) of the training MFCC matrix. Past that, no increase in accuracy was observed, and further increasing the codebook size saw only diminishing returns.
+
+We also modified our vector quantization function to allow for codebook sizes that were not powers of 2. Since the LBG algorithm inherently doubles each iteration, we end up with a quickly increasing codebook. To accomodate for this, on our last iteration we trim down the codebook size by trimming off random codewords and rerunning the centroid positioning optimization to adjust them to the lowest distortion. This effectively produces a codebook with any size possible for M.
+
+### 4.3 Final results
+Our final results showed high accuracy.
 | Test | Description | Result |
 | :---- | :---- | :---- |
-| 7 | Recognition rate of baseline “zero” recordings | 8/8 (100%%) |
-| 8 | Recognition rate after using notch filters | 8/8 (100%%) |
+| 7 | Recognition rate of baseline “zero” recordings | 8/8 (100%) |
+| 8 | Recognition rate after using notch filters | 8/8 (100%) |
 | 9 | 2024 student “zero” recordings + baseline “zero” recordings | 16/18 (89%) |
 | 10a.1 | Accuracy of 2024 student data; “twelve” results vs “zero” results | "twelve": 15/18 (83%)<br>"zero" 16/18 (89%) |
 | 10a.2 | Accuracy of 2024 student data; speaker recognition vs word recognition | Speaker: 31/36 (86.1%)<br>word: 36/36 (100%)|
 | 10b | 2025 student data<br>speaker recognition using "five" vs using "eleven" and total recognition results | "five": 23/23 (100%)<br>"eleven": 22/23 (95.6%)<br>word classification 46/46 (100%) |
 
-We saw improved codebook matching with increased codebook size. Accuracy in recognition increased with codebook size until the size is about 3/4 (CHECK) of the training MFCC matrix. Past that, no increase in accuracy was observed, and further increasing the codebook size saw only diminishing returns.
-
-### 4.3 Final results
-Final results will be added for the final report.
-### 4.2 Optimization
-With our initial tweaks to the accuracy of the VQ clustering, we saw improved results.
+We were separately able to achieve high recognition on our lowest performing data with notch filtering and using VQ clustering on the test data.
 | Test | Description | Result |
 | :---- | :---- | :---- |
-| 7 | Recognition rate of baseline “zero” recordings | 8/8 (100%%) |
-| 8 | Recognition rate after using notch filters | 8/8 (100%%) |
-| 9 | 2024 student “zero” recordings + baseline “zero” recordings | 16/18 (89%) |
-| 10a.1 | Accuracy of 2024 student data; “twelve” results vs “zero” results | "twelve": 17/18 (94%)<br>"zero" 16/18 (89%) |
-| 10a.2 | Accuracy of 2024 student data; speaker recognition vs word recognition | Speaker: 31/36 (86.1%)<br>word: 36/36 (100%)|
-| 10b | 2025 student data<br>speaker recognition using "five" vs using "eleven" and total recognition results | "five": 23/23 (100%)<br>"eleven": 22/23 (95.6%)<br>word classification 46/46 (100%) |
+| 7 | Recognition rate of baseline “zero” recordings | 8/8 (100%) |
+| 8 | Recognition rate after using notch filters | 8/8 (100%) |
+| 10a.1 | Accuracy of 2024 student data; “twelve” results vs “zero” results | "twelve": 17/18 (94%)|
