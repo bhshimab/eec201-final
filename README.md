@@ -174,7 +174,9 @@ For feature matching, we adopt the Vector Quantization (VQ) method. Clustering i
 </div>
 
 
-
+| ![figure3.1](./VQTraining.gif) | 
+|:--:| 
+| *Figure 3.1. K-Means Vector Quantization algorithm steps, showing the scatter of vector points for the first two dimensions of the cepstrum (top, blue), as well as the centroids (top, red) and Voronoi regions for the centroids (top, orange). The mean distortion distances are shown for each iteration for each codebook bifurcation (bottom, black).* |
 
 
 Selection of *ε* too small keeps the split centroids too close together, and the minimum distance from all vectors to the nearest centroid may be assigned only to a single centroid. Thus we employ one of two methods:
