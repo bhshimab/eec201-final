@@ -228,7 +228,7 @@ Tests 1-6 are located in /Github/Result_Plots. Results for tests are discussed i
 
 ### 4.2 Optimization
 With our initial tweaks to the accuracy of the VQ clustering, we saw improved results.
-We saw improved codebook matching with increased codebook size. Accuracy in recognition increased with codebook size until the size is about 3/4 (CHECK) of the training MFCC matrix. Past that, no increase in accuracy was observed, and further increasing the codebook size saw only diminishing returns.
+We saw improved codebook matching with increased codebook size. Accuracy in recognition increased with codebook size until the size is about 1/2 of the training MFCC matrix. Past that, no increase in accuracy was observed, and further increasing the codebook size saw only diminishing returns with increasing calculation size.
 
 We also modified our vector quantization function to allow for codebook sizes that were not powers of 2. Since the LBG algorithm inherently doubles each iteration, we end up with a quickly increasing codebook. To accomodate for this, on our last iteration we trim down the codebook size by trimming off random codewords and rerunning the centroid positioning optimization to adjust them to the lowest distortion. This effectively produces a codebook with any size possible for M.
 
