@@ -3,6 +3,8 @@
 
 Run "batchtest.m" to demonstrate tests 7-10 (uncomment out the task function as described at the top of the file). All necessary functions are contained in this file.
 
+Final code is contained in "batchtest.m" as well as parallel efforts in /RDO Github Final Code
+
 # Speaker Recognition Report
 ### Table of Contents  
 - [1. Project summary](#1-project-summary)
