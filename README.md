@@ -230,6 +230,8 @@ We saw improved codebook matching with increased codebook size. Accuracy in reco
 
 We also modified our vector quantization function to allow for codebook sizes that were not powers of 2. Since the LBG algorithm inherently doubles each iteration, we end up with a quickly increasing codebook. To accomodate for this, on our last iteration we trim down the codebook size by trimming off random codewords and rerunning the centroid positioning optimization to adjust them to the lowest distortion. This effectively produces a codebook with any size possible for M.
 
+We also played around with quantizing the test vectors to see if we could get similar accuracy even if our initial tests showed poor results with this method. However, we got promising results in parallel testing, which we show below.
+
 ### 4.3 Final results
 Our final results showed high accuracy.
 | Test | Description | Result |
